@@ -1,0 +1,21 @@
+{
+  "name": "tank_online",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "localhost": "pnpm dev --host 0.0.0.0",
+    "serve": "node server/index.js",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "5.0.2",
+    "vite": "4.4.5"
+  },
+  "dependencies": {
+    "konva": "9.2.2",
+    "socket.io-client": "4.7.2"
+  }
+}
