@@ -55,30 +55,46 @@ export default class Game {
         socket.to(this.room1).emit('updateTanks', this.outClients)
       })
       const tankConfig = settings.tank_config
+      let lastTime = 0
+      const timeDiff = 1000 / settings.game_config.fps
       socket.on('moveTank', args => {
         console.log('moveTank', args)
 
-        for (let i = 0; i < tankConfig.step_speed; i++) {
+        // 控制帧率
+        const nowTime = Date.now()
+        if (nowTime - lastTime < timeDiff) {
+          return
+        }
+        lastTime = nowTime
+        try {
+          for (let i = 0; i < tankConfig.step_speed; i++) {
 
-          let x = this.clients[socket.id].tank_status.x
-          let y = this.clients[socket.id].tank_status.y
-          if ('ArrowLeft' === args) {
-            x = x - tankConfig.step_size
-          }
-          if ('ArrowRight' === args) {
-            x = x + tankConfig.step_size
-          }
-          if ('ArrowUp' === args) {
-            y = y - tankConfig.step_size
-          }
-          if ('ArrowDown' === args) {
-            y = y + tankConfig.step_size
-          }
+            let x = this.clients[socket.id].tank_status.x
+            let y = this.clients[socket.id].tank_status.y
+            if ('ArrowLeft' === args) {
+              if (x <= 0) return
+              x = x - tankConfig.step_size
+            }
+            if ('ArrowRight' === args) {
+              if (x >= 1) return
+              x = x + tankConfig.step_size
+            }
+            if ('ArrowUp' === args) {
+              if (y <= 0) return
+              y = y - tankConfig.step_size
+            }
+            if ('ArrowDown' === args) {
+              if (y >= 1) return
+              y = y + tankConfig.step_size
+            }
 
-          this.clients[socket.id].tank_status.x = x
-          this.clients[socket.id].tank_status.y = y
-          this.outClients[socket.id] = this.clients[socket.id].print()
-          io.to(this.room1).emit('updateTanks', this.outClients)
+            this.clients[socket.id].tank_status.x = x
+            this.clients[socket.id].tank_status.y = y
+            this.outClients[socket.id] = this.clients[socket.id].print()
+            io.to(this.room1).emit('updateTanks', this.outClients)
+          }
+        } catch (e) {
+          console.log(e)
         }
       })
     })

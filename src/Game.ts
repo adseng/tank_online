@@ -4,6 +4,7 @@ import { settings } from './Settings.ts'
 import Layer = Konva.Layer
 import { io, Socket } from 'socket.io-client'
 import { TankStatus } from './type.ts'
+import Animation = Konva.Animation
 
 class Game {
   stage: Stage | undefined
@@ -14,8 +15,10 @@ class Game {
     space: false
   }
   // 游戏帧率
-  fps = 20
+  fps = 60
+  timeDiff = 1000 / this.fps
   lastTime = 0
+  anim: Animation | undefined
 
   constructor() {
     this.loop = this.loop.bind(this)
@@ -83,7 +86,7 @@ class Game {
         const user_name = new Konva.Text({
           text: data.user_name,
           x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y - data.tank_status.radius*2
+          y: this.playersLayer!.height() * data.tank_status.y - data.tank_status.radius * 2
         })
         user_name.offsetX(user_name.width() / 2)
         this.playersLayer!.add(user_name)
@@ -110,7 +113,8 @@ class Game {
         this.socket!.emit('join', user_name)
         this.initGameActions()
         this.moveController()
-        requestAnimationFrame(this.loop)
+        // requestAnimationFrame(this.loop)
+        this.loop()
       } else {
         // 输入内容不符合要求
         // 显示提示或执行其他操作...
@@ -150,16 +154,17 @@ class Game {
     }
   }
 
-  loop(time: number) {
-    requestAnimationFrame(this.loop)
-    if (time - this.lastTime < 1000 / this.fps) {
-      return
-    }
-    // let realFPS = 1000 / (time - lastTime)
-    // console.log('real fps', realFPS)
-    // do something
-    this.moveController()
-    this.lastTime = time
+  loop() {
+    this.anim = new Konva.Animation(frame => {
+      if (!frame) return false
+      if (frame.time - this.lastTime > this.timeDiff) {
+        this.moveController()
+        this.lastTime = frame.time
+      } else {
+        return false
+      }
+    }, this.playersLayer)
+    this.anim!.start()
   }
 
 }

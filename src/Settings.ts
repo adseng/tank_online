@@ -5,7 +5,7 @@ class Settings {
         fill: '#92ba92'
     }
 
-    socket_url = 'ws://192.180.3.47:3000'
+    socket_url = 'ws://localhost:3000'
 
     constructor() {
     }

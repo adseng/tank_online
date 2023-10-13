@@ -6,5 +6,8 @@ export default {
     step_size: 0.01,
     step_speed: 1,
     fill: () => getRandomColorRGB()
+  },
+  game_config: {
+    fps: 60
   }
 }
