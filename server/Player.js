@@ -4,6 +4,7 @@ export default class Player {
   id
   user_name
   tank_status
+  direction
 
   constructor({ id, user_name }) {
     this.id = id
@@ -12,7 +13,8 @@ export default class Player {
       radius: settings.tank_config.circle_radius,
       x: +Math.random().toFixed(1),
       y: +Math.random().toFixed(1),
-      fill: settings.tank_config.fill()
+      fill: settings.tank_config.fill(),
+      direction: 'up'
     }
   }
 
@@ -20,7 +22,8 @@ export default class Player {
     return {
       id: this.id,
       user_name: this.user_name,
-      tank_status: this.tank_status
+      tank_status: this.tank_status,
+      direction: this.direction
     }
   }
 }

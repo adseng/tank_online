@@ -3,4 +3,5 @@ export interface TankStatus {
     y: number
     fill: string
     radius: number
+    direction: 'left' | 'right' | 'up' | 'down'
 }

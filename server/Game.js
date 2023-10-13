@@ -71,25 +71,31 @@ export default class Game {
 
             let x = this.clients[socket.id].tank_status.x
             let y = this.clients[socket.id].tank_status.y
+            let direction = 'up'
             if ('ArrowLeft' === args) {
               if (x <= 0) return
               x = x - tankConfig.step_size
+              direction = 'left'
             }
             if ('ArrowRight' === args) {
               if (x >= 1) return
               x = x + tankConfig.step_size
+              direction = 'right'
             }
             if ('ArrowUp' === args) {
               if (y <= 0) return
               y = y - tankConfig.step_size
+              direction = 'up'
             }
             if ('ArrowDown' === args) {
               if (y >= 1) return
               y = y + tankConfig.step_size
+              direction = 'down'
             }
 
             this.clients[socket.id].tank_status.x = x
             this.clients[socket.id].tank_status.y = y
+            this.clients[socket.id].tank_status.direction = direction
             this.outClients[socket.id] = this.clients[socket.id].print()
             io.to(this.room1).emit('updateTanks', this.outClients)
           }

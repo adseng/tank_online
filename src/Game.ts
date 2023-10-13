@@ -5,6 +5,7 @@ import Layer = Konva.Layer
 import { io, Socket } from 'socket.io-client'
 import { TankStatus } from './type.ts'
 import Animation = Konva.Animation
+import tankImg from './assets/tank1.png'
 
 class Game {
   stage: Stage | undefined
@@ -14,6 +15,9 @@ class Game {
   keys: Record<any, any> = {
     space: false
   }
+  players: { id: number, user_name: string, tank_status: TankStatus }[] = []
+  imgs: any = {}
+
   // 游戏帧率
   fps = 60
   timeDiff = 1000 / this.fps
@@ -22,6 +26,8 @@ class Game {
 
   constructor() {
     this.loop = this.loop.bind(this)
+    this.paint = this.paint.bind(this)
+    this.loadAsset()
 
     this.initStage()
     console.log('initStage')
@@ -36,6 +42,8 @@ class Game {
     console.log('initConnectServer')
     this.toJoinGame()
     console.log('toJoinGame')
+
+
   }
 
   initStage() {
@@ -75,24 +83,34 @@ class Game {
     })
 
     this.socket.on('updateTanks', (args: { id: number, user_name: string, tank_status: TankStatus }[]) => {
-      this.playersLayer!.destroyChildren()
-      for (let data of Object.values(args)) {
-        const circle1 = new Konva.Circle({
-          radius: data.tank_status.radius,
-          fill: data.tank_status.fill,
-          x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y
-        })
-        const user_name = new Konva.Text({
-          text: data.user_name,
-          x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y - data.tank_status.radius * 2
-        })
-        user_name.offsetX(user_name.width() / 2)
-        this.playersLayer!.add(user_name)
-        this.playersLayer!.add(circle1)
-      }
+      this.players = Object.values(args)
+      this.paint()
+      // requestAnimationFrame(this.paint)
     })
+  }
+
+  paint() {
+    this.playersLayer!.destroyChildren()
+    for (let data of this.players) {
+      const tank = new Konva.Path({
+        data: settings.shape_path,
+        fill: data.tank_status.fill,
+        x: this.playersLayer!.width() * data.tank_status.x,
+        y: this.playersLayer!.height() * data.tank_status.y,
+        scaleX: 0.1,
+        scaleY: 0.1,
+        rotation: settings.direction_to_rotation[data.tank_status.direction]
+      })
+
+      const user_name = new Konva.Text({
+        text: data.user_name,
+        x: this.playersLayer!.width() * data.tank_status.x,
+        y: this.playersLayer!.height() * data.tank_status.y - data.tank_status.radius * 2
+      })
+      user_name.offsetX(user_name.width() / 2)
+      this.playersLayer!.add(user_name)
+      this.playersLayer!.add(tank)
+    }
   }
 
   toJoinGame() {
@@ -165,6 +183,13 @@ class Game {
       }
     }, this.playersLayer)
     this.anim!.start()
+  }
+
+  loadAsset() {
+    const image = new Image()
+    image.src = tankImg
+    this.imgs['tank'] = image
+
   }
 
 }
