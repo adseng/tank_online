@@ -6,6 +6,7 @@ class Settings {
   background_layer = {
     fill: '#92ba92'
   }
+  measuring_scale = 1000
 
   socket_url = 'ws://localhost:3000'
 

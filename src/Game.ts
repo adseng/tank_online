@@ -3,7 +3,7 @@ import Stage = Konva.Stage
 import { settings } from './Settings.ts'
 import Layer = Konva.Layer
 import { io, Socket } from 'socket.io-client'
-import { TankStatus } from './type.ts'
+import { Player } from './type.ts'
 import Animation = Konva.Animation
 import tankImg from './assets/tank1.png'
 
@@ -15,11 +15,11 @@ class Game {
   keys: Record<any, any> = {
     space: false
   }
-  players: { id: number, user_name: string, tank_status: TankStatus }[] = []
+  players: Player[] = []
   imgs: any = {}
 
   // 游戏帧率
-  fps = 60
+  fps = 200
   timeDiff = 1000 / this.fps
   lastTime = 0
   anim: Animation | undefined
@@ -82,9 +82,8 @@ class Game {
       upgrade: false
     })
 
-    this.socket.on('updateTanks', (args: { id: number, user_name: string, tank_status: TankStatus }[]) => {
+    this.socket.on('updateTanks', (args: Player[]) => {
       this.players = Object.values(args)
-      this.paint()
       // requestAnimationFrame(this.paint)
     })
   }
@@ -92,25 +91,81 @@ class Game {
   paint() {
     this.playersLayer!.destroyChildren()
     for (let data of this.players) {
-      const tank = new Konva.Path({
-        data: settings.shape_path,
-        fill: data.tank_status.fill,
-        x: this.playersLayer!.width() * data.tank_status.x,
-        y: this.playersLayer!.height() * data.tank_status.y,
-        scaleX: 0.1,
-        scaleY: 0.1,
-        rotation: settings.direction_to_rotation[data.tank_status.direction]
-      })
+      if (data.tank_status) {
+        // const tank = new Konva.Path({
+        //   data: settings.shape_path,
+        //   fill: data.tank_status.fill,
+        //   x: this.playersLayer!.width() * data.tank_status.x,
+        //   y: this.playersLayer!.height() * data.tank_status.y,
+        //   scaleX: 0.1,
+        //   scaleY: 0.1,
+        //   rotation: settings.direction_to_rotation[data.tank_status.direction]
+        // })
 
-      const user_name = new Konva.Text({
-        text: data.user_name,
-        x: this.playersLayer!.width() * data.tank_status.x,
-        y: this.playersLayer!.height() * data.tank_status.y - data.tank_status.radius * 2
-      })
-      user_name.offsetX(user_name.width() / 2)
-      this.playersLayer!.add(user_name)
-      this.playersLayer!.add(tank)
+        const groupTank = new Konva.Group()
+
+        const tank = new Konva.Circle({
+          fill: data.tank_status.fill,
+          x: this.playersLayer!.width() * data.tank_status.x,
+          y: this.playersLayer!.height() * data.tank_status.y,
+          radius: settings.measuring_scale * data.tank_status.radius
+        })
+        groupTank.add(tank)
+        // 炮管
+        const tank_barrel = new Konva.Circle({
+          fill: '#000000',
+          x: tank.x(),
+          y: tank.y(),
+          radius: tank.radius() / 4,
+          rotation: settings.direction_to_rotation[data.tank_status.direction],
+          scaleY: 3,
+          scaleX: 0.5
+        })
+
+        if (data.tank_status.direction === 'up') {
+          tank_barrel.y(tank.y() - tank.radius())
+        }
+        if (data.tank_status.direction === 'down') {
+          tank_barrel.y(tank.y() + tank.radius())
+        }
+        if (data.tank_status.direction === 'left') {
+          tank_barrel.x(tank.x() - tank.radius())
+        }
+        if (data.tank_status.direction === 'right') {
+          tank_barrel.x(tank.x() + tank.radius())
+        }
+        groupTank.add(tank_barrel)
+        // 炮管底座
+        const tank_barrel2 = new Konva.Circle({
+          fill: 'rgba(54,50,138)',
+          x: tank.x(),
+          y: tank.y(),
+          radius: tank.radius() / 2,
+        })
+        groupTank.add(tank_barrel2)
+
+        const user_name = new Konva.Text({
+          text: data.user_name,
+          x: this.playersLayer!.width() * data.tank_status.x,
+          y: this.playersLayer!.height() * data.tank_status.y
+        })
+        user_name.offsetX(user_name.width() / 2)
+        this.playersLayer!.add(groupTank)
+        this.playersLayer!.add(user_name)
+      }
+
+      if (data.bullet_status) {
+        const bullet = new Konva.Circle({
+          radius: settings.measuring_scale * data.bullet_status.radius,
+          fill: data.bullet_status.fill,
+          x: this.playersLayer!.width() * (data.bullet_status.x),
+          y: this.playersLayer!.height() * (data.bullet_status.y)
+        })
+        this.playersLayer!.add(bullet)
+      }
+
     }
+
   }
 
   toJoinGame() {
@@ -149,11 +204,11 @@ class Game {
   initGameActions() {
 
     window.addEventListener('keydown', (e) => {
-      this.keys[e.key] = true
+      this.keys[e.code] = true
     })
 
     window.addEventListener('keyup', (e) => {
-      this.keys[e.key] = false
+      this.keys[e.code] = false
     })
   }
 
@@ -170,6 +225,9 @@ class Game {
     if (this.keys['ArrowDown']) {
       this.socket!.emit('moveTank', 'ArrowDown')
     }
+    if (this.keys['Space']) {
+      this.socket!.emit('shut', '')
+    }
   }
 
   loop() {
@@ -178,6 +236,7 @@ class Game {
       if (frame.time - this.lastTime > this.timeDiff) {
         this.moveController()
         this.lastTime = frame.time
+        this.paint()
       } else {
         return false
       }
