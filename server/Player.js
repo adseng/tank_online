@@ -57,6 +57,7 @@ export default class Player {
   createBullet() {
     // 一次仅存在一发
     if (this.bullet_status) return
+    if (!this.tank_status) return
     this.bullet_status = {
       x: this.tank_status.x,
       y: this.tank_status.y,

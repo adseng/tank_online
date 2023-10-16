@@ -64,7 +64,7 @@ class Game {
       fill: settings.background_layer.fill
     })
     const gameDesp = new Konva.Text({
-      text: '按上下左右键移动',
+      text: '按上下左右键移动，空格发射',
       fontSize: 40
     })
     this.backgroundLayer.add(layerBackground)
@@ -147,7 +147,8 @@ class Game {
         const user_name = new Konva.Text({
           text: data.user_name,
           x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y
+          y: this.playersLayer!.height() * data.tank_status.y,
+          fill: '#fff'
         })
         user_name.offsetX(user_name.width() / 2)
         this.playersLayer!.add(groupTank)

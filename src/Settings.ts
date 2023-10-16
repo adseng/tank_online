@@ -8,7 +8,7 @@ class Settings {
   }
   measuring_scale = 1000
 
-  socket_url = 'ws://localhost:3000'
+  socket_url = 'ws://192.180.3.47:3000'
 
   direction_to_rotation = {
     left: -90,
