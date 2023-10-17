@@ -65,7 +65,8 @@ class Game {
     })
     const gameDesp = new Konva.Text({
       text: '按上下左右键移动，空格发射',
-      fontSize: 40
+      fontSize: 40,
+      fill: settings.background_layer.text_color
     })
     this.backgroundLayer.add(layerBackground)
     this.backgroundLayer.add(gameDesp)

@@ -4,7 +4,8 @@ class Settings {
   stage_width: number = window.innerWidth
   stage_height: number = window.innerHeight
   background_layer = {
-    fill: '#92ba92'
+    fill: '#92ba92',
+    text_color: '#000000'
   }
   measuring_scale = 1000
 

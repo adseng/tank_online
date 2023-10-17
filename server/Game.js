@@ -65,7 +65,7 @@ export default class Game {
         }
         lastTime = nowTime
 
-        this.clients[socket.id].moveTank(args)
+        this.clients[socket.id]?.moveTank(args)
       })
 
       socket.on('shut', args => {
