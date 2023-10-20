@@ -6,18 +6,18 @@ settings:
 
 dependencies:
   konva:
-    specifier: ^9.2.2
+    specifier: 9.2.2
     version: registry.npmmirror.com/konva@9.2.2
   socket.io-client:
-    specifier: ^4.7.2
+    specifier: 4.7.2
     version: registry.npmmirror.com/socket.io-client@4.7.2
 
 devDependencies:
   typescript:
-    specifier: ^5.0.2
+    specifier: 5.0.2
     version: registry.npmmirror.com/typescript@5.0.2
   vite:
-    specifier: ^4.4.5
+    specifier: 4.4.5
     version: registry.npmmirror.com/vite@4.4.5
 
 packages:

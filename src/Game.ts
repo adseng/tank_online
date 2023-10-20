@@ -90,6 +90,8 @@ class Game {
   }
 
   paint() {
+    // todo 比例尺
+    const size = this.playersLayer!.height() <= this.playersLayer!.width() ? this.playersLayer!.height() : this.playersLayer!.width()
     this.playersLayer!.destroyChildren()
     for (let data of this.players) {
       if (data.tank_status) {
@@ -107,9 +109,9 @@ class Game {
 
         const tank = new Konva.Circle({
           fill: data.tank_status.fill,
-          x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y,
-          radius: settings.measuring_scale * data.tank_status.radius
+          x: size * data.tank_status.x,
+          y: size * data.tank_status.y,
+          radius: size * data.tank_status.radius,
         })
         groupTank.add(tank)
         // 炮管
@@ -147,8 +149,8 @@ class Game {
 
         const user_name = new Konva.Text({
           text: data.user_name,
-          x: this.playersLayer!.width() * data.tank_status.x,
-          y: this.playersLayer!.height() * data.tank_status.y,
+          x: tank.x(),
+          y: tank.y(),
           fill: '#fff'
         })
         user_name.offsetX(user_name.width() / 2)
@@ -158,10 +160,10 @@ class Game {
 
       if (data.bullet_status) {
         const bullet = new Konva.Circle({
-          radius: settings.measuring_scale * data.bullet_status.radius,
+          radius: size * data.bullet_status.radius,
           fill: data.bullet_status.fill,
-          x: this.playersLayer!.width() * (data.bullet_status.x),
-          y: this.playersLayer!.height() * (data.bullet_status.y)
+          x: size * (data.bullet_status.x),
+          y: size * (data.bullet_status.y)
         })
         this.playersLayer!.add(bullet)
       }

@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   socket.io:
-    specifier: ^4.7.2
+    specifier: 4.7.2
     version: registry.npmmirror.com/socket.io@4.7.2
 
 packages:
